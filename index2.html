@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera with Metadata</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; text-align: center; }
+    video, img { max-width: 100%; border: 1px solid #ccc; margin-top: 10px; }
+    #orientation { margin-top: 20px; font-size: 1.2em; }
+    button { margin: 10px; padding: 10px 20px; font-size: 1em; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Съёмка фото с метаданными</h1>
+  <video id="preview" autoplay></video>
+  <div>
+    <button id="capture">Сделать фото</button>
+    <button id="switch-camera">Сменить камеру</button>
+  </div>
+  <p id="orientation">Азимут: 0° | Угол наклона: 0°</p>
+
+  <canvas id="canvas" style="display: none;"></canvas>
+
+  <script>
+    const video = document.getElementById('preview');
+    const canvas = document.getElementById('canvas');
+    const orientationDisplay = document.getElementById('orientation');
+    const captureButton = document.getElementById('capture');
+    const switchCameraButton = document.getElementById('switch-camera');
+
+    let currentCamera = "environment"; // Текущая камера: основная ("environment")
+    let orientationData = { azimuth: 0, tilt: 0 };
+
+    // Функция для запуска камеры
+    async function startCamera(facingMode = "environment") {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
+        video.srcObject = stream;
+      } catch (error) {
+        alert('Ошибка доступа к камере: ' + error.message);
+      }
+    }
+
+    // Переключение между камерами
+    switchCameraButton.addEventListener('click', () => {
+      currentCamera = currentCamera === "environment" ? "user" : "environment";
+      startCamera(currentCamera);
+    });
+
+    // Обработка ориентации устройства
+    window.addEventListener('deviceorientation', (event) => {
+      const { alpha, beta } = event;
+
+      // Преобразование в сферическую систему координат
+      orientationData.azimuth = alpha || 0; // Азимут (φ)
+      orientationData.tilt = 90 - Math.abs(beta || 0); // Угол наклона (θ)
+
+      // Обновление отображения ориентации
+      orientationDisplay.textContent = `
+        Азимут: ${orientationData.azimuth.toFixed(2)}° | 
+        Угол наклона: ${orientationData.tilt.toFixed(2)}°
+      `;
+    });
+
+    // Съёмка фотографии
+    captureButton.addEventListener('click', () => {
+      const context = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight + 50; // Увеличиваем высоту для добавления метаданных
+
+      // Сохраняем изображение с камеры
+      context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+      // Добавляем текст с ориентацией
+      context.fillStyle = "white";
+      context.font = "16px Arial";
+      context.fillText(
+        `Азимут: ${orientationData.azimuth.toFixed(2)}°, Угол наклона: ${orientationData.tilt.toFixed(2)}°`,
+        10,
+        video.videoHeight + 30
+      );
+
+      // Создаём ссылку для скачивания
+      const photoData = canvas.toDataURL('image/jpeg');
+      const link = document.createElement('a');
+      link.href = photoData;
+      link.download = `photo_with_metadata.jpg`;
+      link.click();
+    });
+
+    // Запускаем основную камеру при загрузке
+    startCamera();
+  </script>
+</body>
+</html>
