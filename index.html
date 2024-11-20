@@ -3,55 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Camera with Orientation</title>
+  <title>Camera with Metadata</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 20px; text-align: center; }
     video, img { max-width: 100%; border: 1px solid #ccc; margin-top: 10px; }
     #orientation { margin-top: 20px; font-size: 1.2em; }
-    button { margin-top: 10px; padding: 10px 20px; font-size: 1em; cursor: pointer; }
+    button { margin: 10px; padding: 10px 20px; font-size: 1em; cursor: pointer; }
   </style>
 </head>
 <body>
-  <h1>Photo with Orientation Data</h1>
+  <h1>Съёмка фото с метаданными</h1>
   <video id="preview" autoplay></video>
-  <button id="capture">Capture Photo</button>
-  <p id="orientation">Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
-  <h2>Captured Photo:</h2>
-  <img id="photo" alt="Captured photo will appear here">
+  <div>
+    <button id="capture">Сделать фото</button>
+    <button id="switch-camera">Сменить камеру</button>
+  </div>
+  <p id="orientation">Азимут: 0° | Угол наклона: 0°</p>
 
   <canvas id="canvas" style="display: none;"></canvas>
 
   <script>
     const video = document.getElementById('preview');
     const canvas = document.getElementById('canvas');
-    const photo = document.getElementById('photo');
     const orientationDisplay = document.getElementById('orientation');
     const captureButton = document.getElementById('capture');
+    const switchCameraButton = document.getElementById('switch-camera');
 
-    let orientationData = { azimuth: 0, pitch: 0, roll: 0 };
+    let currentCamera = "environment"; // Текущая камера: основная ("environment")
+    let orientationData = { azimuth: 0, tilt: 0 };
 
-    // Запуск камеры
-    async function startCamera() {
+    // Функция для запуска камеры
+    async function startCamera(facingMode = "environment") {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode } });
         video.srcObject = stream;
       } catch (error) {
-        alert('Error accessing camera: ' + error.message);
+        alert('Ошибка доступа к камере: ' + error.message);
       }
     }
 
-    // Обработка данных ориентации устройства
-    window.addEventListener('deviceorientation', (event) => {
-      const { alpha, beta, gamma } = event;
-      orientationData.azimuth = alpha || 0; // Азимут
-      orientationData.pitch = beta || 0;   // Тангаж
-      orientationData.roll = gamma || 0;   // Крен
+    // Переключение между камерами
+    switchCameraButton.addEventListener('click', () => {
+      currentCamera = currentCamera === "environment" ? "user" : "environment";
+      startCamera(currentCamera);
+    });
 
-      // Обновление данных на экране
+    // Обработка ориентации устройства
+    window.addEventListener('deviceorientation', (event) => {
+      const { alpha, beta } = event;
+
+      // Преобразование в сферическую систему координат
+      orientationData.azimuth = alpha || 0; // Азимут (φ)
+      orientationData.tilt = 90 - Math.abs(beta || 0); // Угол наклона (θ)
+
+      // Обновление отображения ориентации
       orientationDisplay.textContent = `
-        Azimuth: ${orientationData.azimuth.toFixed(2)}° | 
-        Pitch: ${orientationData.pitch.toFixed(2)}° | 
-        Roll: ${orientationData.roll.toFixed(2)}°
+        Азимут: ${orientationData.azimuth.toFixed(2)}° | 
+        Угол наклона: ${orientationData.tilt.toFixed(2)}°
       `;
     });
 
@@ -62,16 +70,20 @@
       canvas.height = video.videoHeight;
 
       // Сохраняем изображение с камеры
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+      // Создаём ссылку для скачивания
       const photoData = canvas.toDataURL('image/jpeg');
+      const link = document.createElement('a');
+      link.href = photoData;
+      link.download = `photo.jpg`;
+      link.click();
 
-      // Отображаем фото на экране
-      photo.src = photoData;
-
-      // Вывод ориентации устройства в консоль (можно добавить обработку)
-      console.log('Photo taken with orientation:', orientationData);
+      // Логируем данные ориентации
+      console.log('Снимок сделан с ориентацией:', orientationData);
     });
 
+    // Запускаем основную камеру при загрузке
     startCamera();
   </script>
 </body>
