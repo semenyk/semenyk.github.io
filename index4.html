@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera with Accelerometer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; text-align: center; }
+    video, img { max-width: 100%; border: 1px solid #ccc; margin-top: 10px; }
+    #orientation { margin-top: 20px; font-size: 1.2em; }
+    button { margin-top: 10px; padding: 10px 20px; font-size: 1em; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Photo with Accelerometer Data</h1>
+  <video id="preview" autoplay></video>
+  <button id="capture">Capture Photo</button>
+  <p id="orientation">X: 0 m/s² | Y: 0 m/s² | Z: 0 m/s²</p>
+  <h2>Captured Photo:</h2>
+  <img id="photo" alt="Captured photo will appear here">
+
+  <canvas id="canvas" style="display: none;"></canvas>
+
+  <script>
+    const video = document.getElementById('preview');
+    const canvas = document.getElementById('canvas');
+    const photo = document.getElementById('photo');
+    const orientationDisplay = document.getElementById('orientation');
+    const captureButton = document.getElementById('capture');
+
+    let accelerationData = { x: 0, y: 0, z: 0 };
+
+    // Запуск камеры
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (error) {
+        alert('Error accessing camera: ' + error.message);
+      }
+    }
+
+    // Инициализация акселерометра
+    if ('Accelerometer' in window) {
+      const accelerometer = new Accelerometer({ frequency: 60 });
+
+      accelerometer.addEventListener('reading', () => {
+        accelerationData.x = accelerometer.x || 0;
+        accelerationData.y = accelerometer.y || 0;
+        accelerationData.z = accelerometer.z || 0;
+
+        // Обновление данных на экране
+        orientationDisplay.textContent = 
+          `X: ${accelerationData.x.toFixed(2)} m/s² | ` +
+          `Y: ${accelerationData.y.toFixed(2)} m/s² | ` +
+          `Z: ${accelerationData.z.toFixed(2)} m/s²`;
+      });
+
+      accelerometer.addEventListener('error', (event) => {
+        alert('Accelerometer error: ' + event.error.name);
+      });
+
+      accelerometer.start();
+    } else {
+      alert('Your device does not support Accelerometer API.');
+    }
+
+    // Съёмка фотографии
+    captureButton.addEventListener('click', () => {
+      const context = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      // Сохраняем изображение с камеры
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const photoData = canvas.toDataURL('image/jpeg');
+
+      // Отображаем фото на экране
+      photo.src = photoData;
+
+      // Вывод данных акселерометра в консоль
+      console.log('Photo taken with acceleration:', accelerationData);
+    });
+
+    startCamera();
+  </script>
+</body>
+</html>
