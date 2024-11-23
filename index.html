@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Camera with Orientation</title>
+  <title>Camera with Accelerometer</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 20px; text-align: center; }
     video, img { max-width: 100%; border: 1px solid #ccc; margin-top: 10px; }
@@ -12,10 +12,10 @@
   </style>
 </head>
 <body>
-  <h1>Photo with Orientation Data</h1>
+  <h1>Photo with Accelerometer Data</h1>
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
-  <p id="orientation">Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
+  <p id="orientation">X: 0 m/s² | Y: 0 m/s² | Z: 0 m/s²</p>
   <h2>Captured Photo:</h2>
   <img id="photo" alt="Captured photo will appear here">
 
@@ -28,7 +28,7 @@
     const orientationDisplay = document.getElementById('orientation');
     const captureButton = document.getElementById('capture');
 
-    let orientationData = { azimuth: 0, pitch: 0, roll: 0 };
+    let accelerationData = { x: 0, y: 0, z: 0 };
 
     // Запуск камеры
     async function startCamera() {
@@ -40,20 +40,30 @@
       }
     }
 
-    // Обработка данных ориентации устройства
-    window.addEventListener('deviceorientation', (event) => {
-      const { alpha, beta, gamma } = event;
-      orientationData.azimuth = alpha || 0; // Азимут
-      orientationData.pitch = beta || 0;   // Тангаж
-      orientationData.roll = gamma || 0;   // Крен
+    // Инициализация акселерометра
+    if ('Accelerometer' in window) {
+      const accelerometer = new Accelerometer({ frequency: 60 });
 
-      // Обновление данных на экране
-      orientationDisplay.textContent = `
-        Azimuth: ${orientationData.azimuth.toFixed(2)}° | 
-        Pitch: ${orientationData.pitch.toFixed(2)}° | 
-        Roll: ${orientationData.roll.toFixed(2)}°
-      `;
-    });
+      accelerometer.addEventListener('reading', () => {
+        accelerationData.x = accelerometer.x || 0;
+        accelerationData.y = accelerometer.y || 0;
+        accelerationData.z = accelerometer.z || 0;
+
+        // Обновление данных на экране
+        orientationDisplay.textContent = 
+          `X: ${accelerationData.x.toFixed(2)} m/s² | ` +
+          `Y: ${accelerationData.y.toFixed(2)} m/s² | ` +
+          `Z: ${accelerationData.z.toFixed(2)} m/s²`;
+      });
+
+      accelerometer.addEventListener('error', (event) => {
+        alert('Accelerometer error: ' + event.error.name);
+      });
+
+      accelerometer.start();
+    } else {
+      alert('Your device does not support Accelerometer API.');
+    }
 
     // Съёмка фотографии
     captureButton.addEventListener('click', () => {
@@ -68,12 +78,11 @@
       // Отображаем фото на экране
       photo.src = photoData;
 
-      // Вывод ориентации устройства в консоль (можно добавить обработку)
-      console.log('Photo taken with orientation:', orientationData);
+      // Вывод данных акселерометра в консоль
+      console.log('Photo taken with acceleration:', accelerationData);
     });
 
     startCamera();
   </script>
 </body>
 </html>
-
