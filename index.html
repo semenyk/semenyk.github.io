@@ -16,6 +16,7 @@
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
   <p id="orientation">X: 0 m/s² | Y: 0 m/s² | Z: 0 m/s²</p>
+    <p id="orientation1">Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
   <h2>Captured Photo:</h2>
   <img id="photo" alt="Captured photo will appear here">
 
@@ -26,6 +27,7 @@
     const canvas = document.getElementById('canvas');
     const photo = document.getElementById('photo');
     const orientationDisplay = document.getElementById('orientation');
+	const orientationDisplay1 = document.getElementById('orientation1');
     const captureButton = document.getElementById('capture');
 
     let accelerationData = { x: 0, y: 0, z: 0 };
@@ -64,6 +66,19 @@
     } else {
       alert('Your device does not support Accelerometer API.');
     }
+	    window.addEventListener('deviceorientation', (event) => {
+      const { alpha, beta, gamma } = event;
+      orientationData.azimuth = alpha || 0; // Азимут
+      orientationData.pitch = beta || 0;   // Тангаж
+      orientationData.roll = gamma || 0;   // Крен
+
+      // Обновление данных на экране
+      orientationDisplay1.textContent = `
+        Azimuth: ${orientationData.azimuth.toFixed(2)}° | 
+        Pitch: ${orientationData.pitch.toFixed(2)}° | 
+        Roll: ${orientationData.roll.toFixed(2)}°
+      `;
+    });
 
     // Съёмка фотографии
     captureButton.addEventListener('click', () => {
