@@ -31,6 +31,7 @@
     const captureButton = document.getElementById('capture');
 
     let accelerationData = { x: 0, y: 0, z: 0 };
+	let orientationData = { azimuth: 0, pitch: 0, roll: 0 };
 
     // Запуск камеры
     async function startCamera() {
