@@ -97,8 +97,61 @@
       // Вывод данных акселерометра в консоль
       console.log('Photo taken with acceleration:', accelerationData);
     });
-
     startCamera();
+	var IP_SERVER = "http://192.168.31.118:404"
+
+	var timeLastConection = 0
+	var now = new Date() ,date = new Date();
+	var checkConection = function(){
+		//now = new Date()
+		//if((now.getTime() - date.getTime()) > 2*1000){
+			//log(1)
+			//date = new Date()
+			xhr.open("GET",IP_SERVER+"/checkConection/")
+			xhr.send()
+		//}
+	}
+	
+
+	let xhr = new XMLHttpRequest()
+	xhr.open("GET",IP_SERVER+"/z."+1+"."+2+"."+3+"/")
+	xhr.send()
+	xhr.onload = function() {
+		if(xhr.status == 200){
+			log(xhr.response)
+			//f.innerHTML = "<input type=\"text\"></input> fdgfd <input type=\"button\">"
+			//game.startLoop('menu');
+			//log(JSON.parse( xhr.response))
+		}else{
+			alert("error "+xhr.status)
+		}
+	}
+
+	xhr.onerror = function() { // происходит, только когда запрос совсем не получилось выполнить
+		alert(`Ошибка соединения`)
+	}
+
+	xhr.onprogress = function(event) { // запускается периодически
+	  // event.loaded - количество загруженных байт
+	  // event.lengthComputable = равно true, если сервер присылает заголовок Content-Length
+	  // event.total - количество байт всего (только если lengthComputable равно true)
+		log(`Загружено ${event.loaded} из ${event.total}`)
+	}
+
+	
+	function Loop(){
+		xhr.open("GET",IP_SERVER+"/z."+orientationData.azimuth+"."+orientationData.pitch+"."+orientationData.roll+"/")
+		xhr.send()
+		
+		setTimeout(Loop, 500)
+	}
+
+
+
+
+
+
+
   </script>
 </body>
 </html>
