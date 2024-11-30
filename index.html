@@ -90,7 +90,19 @@
 			// Пример: выводим первый пиксель
 			console.log('Первый пиксель (R, G, B, A):', pixels[0], pixels[1], pixels[2], pixels[3]);
 		};
-		
+		let xhr = new XMLHttpRequest()
+		xhr.open("GET",IP_SERVER+"/z."+1+"."+2+"."+3+"/")
+		xhr.send()
+		xhr.onload = function() {
+			if(xhr.status == 200){
+				log(xhr.response)
+				//f.innerHTML = "<input type=\"text\"></input> fdgfd <input type=\"button\">"
+				//game.startLoop('menu');
+				//log(JSON.parse( xhr.response))
+			}else{
+				alert("error "+xhr.status)
+			}
+		}
 		
 		
 		
