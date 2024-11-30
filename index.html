@@ -91,6 +91,7 @@
 			console.log('Первый пиксель (R, G, B, A):', pixels[0], pixels[1], pixels[2], pixels[3]);
 		};
 		let xhr = new XMLHttpRequest()
+		var IP_SERVER="http://192.168.1.6:404"
 		xhr.open("GET",IP_SERVER+"/z."+1+"."+2+"."+3+"/")
 		xhr.send()
 		xhr.onload = function() {
