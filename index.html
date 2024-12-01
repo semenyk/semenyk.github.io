@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,7 +94,7 @@
 		var IP_SERVER="http://192.168.1.6:404"
 		xhr.open("GET",IP_SERVER)
 		//xhr.setRequestHeader("Accept", "text/html");
-		xhr.send()
+		//xhr.send()
 		xhr.onload = function() {
 			if(xhr.status == 200){
 				log(xhr.response)
@@ -105,7 +105,7 @@
 				alert("error "+xhr.status)
 			}
 		}
-		
+		PostPOS(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll)
 		
 		
 		
@@ -115,7 +115,25 @@
       // Вывод ориентации устройства в консоль (можно добавить обработку)
       console.log('Photo taken with orientation:', orientationData);
     });
-
+	
+	var PostPOS = function(IP, p1,p2,p3){
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", IP);
+		xhr.setRequestHeader('Content-Type', 'application/json');
+		xhr.send(JSON.stringify({ param1: p1, param2: p2 , param3: p3}));
+				xhr.onload = function() {
+			if(xhr.status == 200){
+				log(xhr.response)
+				//f.innerHTML = "<input type=\"text\"></input> fdgfd <input type=\"button\">"
+				//game.startLoop('menu');
+				//log(JSON.parse( xhr.response))
+			}else{
+				alert("error "+xhr.status)
+			}
+		}
+	}
+	
+	
     startCamera();
   </script>
 </body>
