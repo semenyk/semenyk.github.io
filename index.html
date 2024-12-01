@@ -12,8 +12,7 @@
   </style>
 </head>
 <body>
-	V0.1
-  <h1>Photo with Orientation DataV0.1</h1>
+	V0.2
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
   <p id="orientation"> Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
@@ -119,10 +118,11 @@
 	
 	var PostPOS = function(IP, p1,p2,p3){
 		var xhr = new XMLHttpRequest();
-		xhr.open("POST", IP);
-		xhr.setRequestHeader('Content-Type', 'application/json');
-		xhr.send(JSON.stringify({ param1: p1, param2: p2 , param3: p3}));
-				xhr.onload = function() {
+		xhr.open("GET", IP+"/"+JSON.stringify({ param1: p1, param2: p2 , param3: p3}));
+		//xhr.setRequestHeader('Content-Type', 'application/json');
+		//xhr.send(JSON.stringify({ param1: p1, param2: p2 , param3: p3}));
+		xhr.send()
+		xhr.onload = function() {
 			if(xhr.status == 200){
 				log(xhr.response)
 				//f.innerHTML = "<input type=\"text\"></input> fdgfd <input type=\"button\">"
