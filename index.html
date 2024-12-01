@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-	V0.3.1
+	V0.3.2
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
   <p id="orientation"> Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
@@ -27,6 +27,8 @@
     const photo = document.getElementById('photo');
     const orientationDisplay = document.getElementById('orientation');
     const captureButton = document.getElementById('capture');
+	
+	var IP_SERVER="http://192.168.1.6:404"
 
     let orientationData = { azimuth: 0, pitch: 0, roll: 0 };
 
@@ -91,7 +93,7 @@
 			console.log('Первый пиксель (R, G, B, A):', pixels[0], pixels[1], pixels[2], pixels[3]);
 		};
 		let xhr = new XMLHttpRequest()
-		var IP_SERVER="http://192.168.1.6:404"
+		
 		//xhr.open("GET",IP_SERVER)
 		//xhr.setRequestHeader("Accept", "text/html");
 		//xhr.send()
@@ -116,6 +118,13 @@
       console.log('Photo taken with orientation:', orientationData);
     });
 	
+	var loop = function(){
+		PostPOS(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll)
+		setTimeout(loop ,100)
+	}
+	
+	
+	
 	var PostPOS = function(IP, p1,p2,p3){
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", IP+"/"+p1+"/"+p2 +"/"+p3+"/")
@@ -124,7 +133,7 @@
 		xhr.send()
 		xhr.onload = function() {
 			if(xhr.status == 200){
-				log(xhr.response)
+				console.log(xhr.response)
 				//f.innerHTML = "<input type=\"text\"></input> fdgfd <input type=\"button\">"
 				//game.startLoop('menu');
 				//log(JSON.parse( xhr.response))
@@ -136,6 +145,7 @@
 	
 	
     startCamera();
+	loop()
   </script>
 </body>
 </html>
