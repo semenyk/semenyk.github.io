@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,10 +12,10 @@
   </style>
 </head>
 <body>
-	V0.3.24
+  <h1>Photo with Orientation Data</h1>
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
-  <p id="orientation"> Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
+  <p id="orientation">Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
   <h2>Captured Photo:</h2>
   <img id="photo" alt="Captured photo will appear here">
 
@@ -27,10 +27,20 @@
     const photo = document.getElementById('photo');
     const orientationDisplay = document.getElementById('orientation');
     const captureButton = document.getElementById('capture');
-	
-	var IP_SERVER="http://192.168.137.1:404"
 
     let orientationData = { azimuth: 0, pitch: 0, roll: 0 };
+    let serverIP = '';
+
+    // Ввод IP сервера
+    function getServerIP() {
+      serverIP = prompt('Please enter the server IP:', '');
+      if (!serverIP) {
+        alert('Server IP is required to proceed.');
+        getServerIP();
+      } else {
+        console.log('Server IP:', serverIP);
+      }
+    }
 
     // Запуск камеры
     async function startCamera() {
@@ -51,9 +61,9 @@
 
       // Обновление данных на экране
       orientationDisplay.textContent = `
-        Azimuth: ${orientationData.azimuth.toFixed(2)}° | 
-        Pitch: ${orientationData.pitch.toFixed(2)}° | 
-        Roll: ${orientationData.roll.toFixed(2)}°
+        Azimuth: ${orientationData.azimuth.toFixed(5)}° | 
+        Pitch: ${orientationData.pitch.toFixed(5)}° | 
+        Roll: ${orientationData.roll.toFixed(5)}°
       `;
     });
 
@@ -66,87 +76,18 @@
       // Сохраняем изображение с камеры
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const photoData = canvas.toDataURL('image/jpeg');
-		
-		var img = new Image()
-		img.src = photoData
-		
-		img.onload = () => {
-			// Создаем временный canvas
-			const tempCanvas = document.createElement('canvas');
-			const ctx = tempCanvas.getContext('2d');
 
-			// Устанавливаем размеры временного canvas равными размеру изображения
-			tempCanvas.width = img.width;
-			tempCanvas.height = img.height;
-
-			// Отрисовываем изображение на временном canvas
-			ctx.drawImage(img, 0, 0);
-
-			// Получаем массив пикселей
-			const imageData = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-			const pixels = imageData.data; // Массив пикселей
-
-			// Выводим массив пикселей в консоль
-			console.log(pixels);
-
-			// Пример: выводим первый пиксель
-			console.log('Первый пиксель (R, G, B, A):', pixels[0], pixels[1], pixels[2], pixels[3]);
-		};
-		let xhr = new XMLHttpRequest()
-		
-		//xhr.open("GET",IP_SERVER)
-		//xhr.setRequestHeader("Accept", "text/html");
-		//xhr.send()
-		xhr.onload = function() {
-			if(xhr.status == 200){
-				log(xhr.response)
-				//f.innerHTML = "<input type=\"text\"></input> fdgfd <input type=\"button\">"
-				//game.startLoop('menu');
-				//log(JSON.parse( xhr.response))
-			}else{
-				alert("error "+xhr.status)
-			}
-		}
-		PostPOS(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll)
-		
-		
-		
       // Отображаем фото на экране
       photo.src = photoData;
 
-      // Вывод ориентации устройства в консоль (можно добавить обработку)
+      // Вывод ориентации устройства и IP сервера в консоль (можно добавить обработку)
       console.log('Photo taken with orientation:', orientationData);
+      console.log('Server IP:', serverIP);
     });
-	
-	var loop = function(){
-		PostPOS(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll)
-		setTimeout(loop ,100)
-	}
-	
-	
-	
-	var PostPOS = function(IP, p1,p2,p3){
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", IP+"/"+p1+"/"+p2 +"/"+p3+"/")
-		//xhr.setRequestHeader('Content-Type', 'application/json');
-		//xhr.send(JSON.stringify({ param1: p1, param2: p2 , param3: p3}));
-		xhr.send()
-		xhr.onload = function() {
-			if(xhr.status == 200){
-				console.log(xhr.response)
-				//f.innerHTML = "<input type=\"text\"></input> fdgfd <input type=\"button\">"
-				//game.startLoop('menu');
-				//log(JSON.parse( xhr.response))
-			}else{
-				alert("error "+xhr.status)
-			}
-		}
-	}
-	
-	
+
+    // Инициализация
+    getServerIP();
     startCamera();
-	loop()
   </script>
 </body>
 </html>
-
