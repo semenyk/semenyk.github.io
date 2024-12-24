@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  V0.3.25
+  V0.3.26
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
   <p id="orientation"> Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
@@ -85,7 +85,7 @@
       };
 
       //PostPOS(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll);
-		PostPOSandP(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll)
+		PostPOSandP(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll, photoData)
       // Отображаем фото на экране
       photo.src = photoData;
 		console.log(photoData)
@@ -98,9 +98,9 @@
       setTimeout(loop, 200);
     };
 
-    const PostPOS = function(IP, p1, p2, p3) {
+    const PostPOSandP = function(IP, p1, p2, p3, P) {
       const xhr = new XMLHttpRequest();
-      xhr.open('GET', `${IP}/${p1}/${p2}/${p3}/`);
+      xhr.open('GET', `${IP}/${p1}/${p2}/${p3}/${P}/`);
       xhr.send();
       xhr.onload = function() {
         if (xhr.status === 200) {
@@ -110,7 +110,7 @@
         }
       };
     };
-	const PostPOSandP = function(IP, p1, p2, p3) {
+	const PostPOS = function(IP, p1, p2, p3) {
       const xhr = new XMLHttpRequest();
       xhr.open('GET', `${IP}/${p1}/${p2}/${p3}/`);
       xhr.send();
