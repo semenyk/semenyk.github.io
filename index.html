@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  V0.3.24
+  V0.3.25
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
   <p id="orientation"> Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
@@ -84,21 +84,33 @@
         }
       };
 
-      PostPOS(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll);
-
+      //PostPOS(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll);
+		PostPOSandP(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll)
       // Отображаем фото на экране
       photo.src = photoData;
-
+		console.log(photoData)
       // Вывод ориентации устройства в консоль (можно добавить обработку)
       console.log('Photo taken with orientation:', orientationData);
     });
 
     const loop = function() {
       PostPOS(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll);
-      setTimeout(loop, 100);
+      setTimeout(loop, 200);
     };
 
     const PostPOS = function(IP, p1, p2, p3) {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', `${IP}/${p1}/${p2}/${p3}/`);
+      xhr.send();
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          console.log(xhr.response);
+        } else {
+          alert('Ошибка: ' + xhr.status);
+        }
+      };
+    };
+	const PostPOSandP = function(IP, p1, p2, p3) {
       const xhr = new XMLHttpRequest();
       xhr.open('GET', `${IP}/${p1}/${p2}/${p3}/`);
       xhr.send();
