@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  V0.3.26
+  V0.3.27
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
   <p id="orientation"> Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
@@ -100,7 +100,7 @@
 
     const PostPOSandP = function(IP, p1, p2, p3, P) {
       const xhr = new XMLHttpRequest();
-      xhr.open('GET', `${IP}/${p1}/${p2}/${p3}/${P}/`);
+      xhr.open('GET', `${IP}/${p1}/${p2}/${p3}/'${P}'/`);
       xhr.send();
       xhr.onload = function() {
         if (xhr.status === 200) {
