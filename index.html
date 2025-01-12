@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  V0.3.31
+  V0.3.32
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
   <p id="orientation"> Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
@@ -83,13 +83,14 @@
 
       // Обновление данных на экране
       orientationDisplay.textContent = `
-        Azimuth: ${orientationData.azimuth.toFixed(2)}° | 
-        Pitch: ${orientationData.pitch.toFixed(2)}° | 
-        Roll: ${orientationData.roll.toFixed(2)}°
+        Azimuth: ${orientationData.azimuth.toFixed(3)}° | 
+        Pitch: ${orientationData.pitch.toFixed(3)}° | 
+        Roll: ${orientationData.roll.toFixed(3)}°
       `;
     });
 
     // Съёмка фотографии
+	/*
 	captureButton.addEventListener('click', async () => {
       try {
         // Получение фотографии через ImageCapture
@@ -102,7 +103,7 @@
         alert('Ошибка захвата фотографии: ' + error.message);
       }
     });
-	/*
+	*/
     captureButton.addEventListener('click', () => {
       const context = canvas.getContext('2d');
       canvas.width = video.videoWidth;
@@ -129,7 +130,6 @@
       // Вывод ориентации устройства в консоль (можно добавить обработку)
       console.log('Photo taken with orientation:', orientationData);
     });
-	*/
 
     const loop = function() {
       PostPOS(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll);
