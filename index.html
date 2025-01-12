@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  V0.3.30
+  V0.3.31
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
   <p id="orientation"> Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
@@ -27,7 +27,9 @@
     const photo = document.getElementById('photo');
     const orientationDisplay = document.getElementById('orientation');
     const captureButton = document.getElementById('capture');
-
+	
+	let imageCapture;
+	
     let IP_SERVER = '';
     let orientationData = { azimuth: 0, pitch: 0, roll: 0 };
 
@@ -55,15 +57,18 @@
 	  try {
 		const constraints = {
 		  video: {
-			width: { ideal: 4608 }, // Максимальная ширина
-			height: { ideal: 3456 }, // Максимальная высота (для 4:3)
 			aspectRatio: 4 / 3,
 			facingMode: { ideal: 'environment' } // Основная камера
 		  }
 		};
+		
 
 		const stream = await navigator.mediaDevices.getUserMedia(constraints);
 		video.srcObject = stream;
+		
+		const track = stream.getVideoTracks()[0];
+        imageCapture = new ImageCapture(track);
+		
 	  } catch (error) {
 		alert('Error accessing camera: ' + error.message);
 	  }
@@ -85,6 +90,19 @@
     });
 
     // Съёмка фотографии
+	captureButton.addEventListener('click', async () => {
+      try {
+        // Получение фотографии через ImageCapture
+        const blob = await imageCapture.takePhoto();
+        const photoURL = URL.createObjectURL(blob);
+        photo.src = photoURL; // Отображение фотографии
+
+        console.log('Photo captured:', photoURL); // URL для отладки
+      } catch (error) {
+        alert('Ошибка захвата фотографии: ' + error.message);
+      }
+    });
+	/*
     captureButton.addEventListener('click', () => {
       const context = canvas.getContext('2d');
       canvas.width = video.videoWidth;
@@ -111,6 +129,7 @@
       // Вывод ориентации устройства в консоль (можно добавить обработку)
       console.log('Photo taken with orientation:', orientationData);
     });
+	*/
 
     const loop = function() {
       PostPOS(IP_SERVER, orientationData.azimuth, orientationData.pitch, orientationData.roll);
