@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  V0.3.27
+  V0.3.28
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
   <p id="orientation"> Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
@@ -41,6 +41,7 @@
     }
 
     // Запуск камеры
+	/*
     async function startCamera() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -49,6 +50,24 @@
         alert('Error accessing camera: ' + error.message);
       }
     }
+	*/
+	async function startCamera() {
+	  try {
+		const constraints = {
+		  video: {
+			width: { ideal: 1920 }, // Максимальная ширина
+			height: { ideal: 1440 }, // Максимальная высота (для 4:3)
+			aspectRatio: 4 / 3,
+			facingMode: { ideal: 'environment' } // Основная камера
+		  }
+		};
+
+		const stream = await navigator.mediaDevices.getUserMedia(constraints);
+		video.srcObject = stream;
+	  } catch (error) {
+		alert('Error accessing camera: ' + error.message);
+	  }
+	}
 
     // Обработка данных ориентации устройства
     window.addEventListener('deviceorientation', (event) => {
