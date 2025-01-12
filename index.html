@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  V0.3.29
+  V0.3.30
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
   <p id="orientation"> Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
@@ -55,6 +55,8 @@
 	  try {
 		const constraints = {
 		  video: {
+			width: { ideal: 4608 }, // Максимальная ширина
+			height: { ideal: 3456 }, // Максимальная высота (для 4:3)
 			aspectRatio: 4 / 3,
 			facingMode: { ideal: 'environment' } // Основная камера
 		  }
