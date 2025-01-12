@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  V0.3.28
+  V0.3.29
   <video id="preview" autoplay></video>
   <button id="capture">Capture Photo</button>
   <p id="orientation"> Azimuth: 0° | Pitch: 0° | Roll: 0°</p>
@@ -33,7 +33,7 @@
 
     // Функция для запроса IP сервера
     function askForIP() {
-      IP_SERVER = prompt('Введите IP сервера (с указанием протокола и порта, например, http://192.168.137.1:404):', 'http://192.168.137.1:404');
+      IP_SERVER = prompt('Введите IP сервера (с указанием протокола и порта, например, http://192.168.1.6:404):', 'http://192.168.1.6:404');
       if (!IP_SERVER) {
         alert('IP сервера не указан. Попробуйте снова.');
         askForIP();
@@ -55,8 +55,6 @@
 	  try {
 		const constraints = {
 		  video: {
-			width: { ideal: 1920 }, // Максимальная ширина
-			height: { ideal: 1440 }, // Максимальная высота (для 4:3)
 			aspectRatio: 4 / 3,
 			facingMode: { ideal: 'environment' } // Основная камера
 		  }
